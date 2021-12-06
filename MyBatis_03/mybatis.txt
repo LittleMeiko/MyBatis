@@ -1,0 +1,72 @@
+1.单个参数：mybatis不会做特殊处理
+  #{参数名}:取出参数值，对参数名没有要求，任意值都可取出参数值
+  
+2.多个参数：mybatis会做特殊处理，多个参数会被封装成Map
+  #{参数名}:从Map中获取指定的key值,key:param1,param2...paramN 或者 参数的索引也可以
+  命名参数：封装参数时明确指定map的key，即@Param(value = "id")
+          
+3.参数的特殊场景：
+  (1)如果参数是Collection(List\Set)类型或者数组，mybatis会做特殊处理，即把传入的list或者数组封装在map中：
+     key：Collection(collection)、List(collection\list)、数组(array)
+                  例如：public Employee getEmpById(List<Integer> ids);
+                  取出list中的第一个参数：id = #{list[0]}
+                  
+4.mybatis源码中关于参数的处理：
+  //由ParamNameResolver解析参数封装成Map
+  public Object getNamedParams(Object[] args) {
+    final int paramCount = names.size();
+    if (args == null || paramCount == 0) {
+      return null;
+    } else if (!hasParamAnnotation && paramCount == 1) {
+      return args[names.firstKey()];
+    } else {
+      final Map<String, Object> param = new ParamMap<Object>();
+      int i = 0;
+      for (Map.Entry<Integer, String> entry : names.entrySet()) {
+        param.put(entry.getValue(), args[entry.getKey()]);
+        // add generic param names (param1, param2, ...)
+        final String genericParamName = GENERIC_NAME_PREFIX + String.valueOf(i + 1);
+        // ensure not to overwrite parameter named with @Param
+        if (!names.containsValue(genericParamName)) {
+          param.put(genericParamName, args[entry.getKey()]);
+        }
+        i++;
+      }
+      return param;
+    }
+  }
+  
+5.参数值的获取：
+  #{}：以预编译的形式将参数设置到sql语句中，相当于JDBC中PrepareStatement，可以防止sql注入
+  ${}: 取出的值直接拼接在sql语句中
+  	   注意：在原生JDBC不支持#{}的地方就可以使用${}
+  	 例如：在分表的情况下，按照年份拆分表
+  	     select * from ${year}_salary where xxx
+  	             在排序情况下：
+  	     select * from tbl_employee where xxx order by ${order_column} ${desc}  	
+  	    
+6.关于#{}更丰富的用法：
+  	(1)规定参数的规则：
+  	  javaType:指定传入字段的java类型
+  	  jdbcType：指定传入字段在数据库中的类型
+  	  mode:存储过程使用
+  	  numericScale:如果是数字可规定保留几位小数
+  	  resultMap:封装的结果类型
+  	  typeHandler:处理这个字段的类型转换器
+  	  jdbcTypeName:指定传入字段在数据库中的类型
+  	  expression:无特殊意义，未来准备支持的功能
+  	(2)jdbcType通常需要在某种情况下被设置：
+  	  	在插入数据为null时，有些数据库可能不能识别mybatis对null的处理，例如Oracle就会报错：无效的列类型
+  	  	因为mybatis对所有的null映射的都是原生jdbc的OTHER类型，而Oracle不支持OTHER类型
+  	  	解决办法：
+  	  		1)指定#{email,jdbcType=NULL}
+  	  		2)在mybatis全局配置文件中设置 jdbcTypeForNull 属性值为NULL
+  	  		
+7.自动映射：
+   (1)autoMappingBehavior默认是PARTIAL，开启自动映射功能。唯一要求是列名要与JavaBean属性名一致。
+   (2)设置mapUnderscoreToCamelCase=true，开启自动驼峰命名规则
+   (3)自定义resultMap,实现高级结果集映射
+   
+ 
+  	  	
+  	 

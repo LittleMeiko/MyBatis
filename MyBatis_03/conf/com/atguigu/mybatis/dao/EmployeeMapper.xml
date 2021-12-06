@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.mybatis.dao.EmployeeMapper">
+<!-- 
+	namespace:名称空间;指定为接口的全类名
+	id：唯一标识
+	resultType：返回值类型
+	#{id}：从传递过来的参数中取出id值
+	
+	public Employee getEmpById(Integer id);
+	
+	databaseId:指定此条sql在哪种数据库厂商的环境下执行
+ -->
+	<select id="getEmpById" resultType="com.atguigu.mybatis.bean.Employee" databaseId="mysql">
+		select * from tbl_employee where id = #{id}
+	</select>
+	
+	<select id="getEmpById" resultType="com.atguigu.mybatis.bean.Employee" databaseId="oracle">
+		select * from tbl_employee where id = #{id}
+	</select>
+	
+	<!-- 
+		useGeneratedKeys="true":使用自增主键获取主键值的策略 
+		keyProperty="id":指定自增主键值的属性，即获取到自增主键值后赋值给JavaBean的哪个属性
+	-->
+	<insert id="addEmp" parameterType="com.atguigu.mybatis.bean.Employee" 
+		useGeneratedKeys="true" keyProperty="id" databaseId="mysql">
+		insert into tbl_employee(
+		  last_name, 
+		  gender, 
+		  email 
+		) values (
+		  #{lastName},
+		  #{gender},
+		  #{email}
+		)
+	</insert>
+	
+	<!-- 
+		Oracle不支持自增主键，使用序列来模拟自增。每次插入数据的主键值是从序列中拿到的值。
+		如何获取到这个值？
+	 -->
+	 <insert id="addEmp" databaseId="oracle">
+	 	<!-- 
+	 		keyProperty:查询出的主键值封装给JavaBean的哪个属性值 
+	 		order:当前sql在插入sql之前执行
+	 		resultType:查出数据的返回值类型是什么
+	 	-->
+	 	<!-- 编写查询主键的sql语句，BEFORE： 
+	 		<selectKey keyProperty="id" order="BEFORE" resultType="Integer">
+	 			select employees_seq.nextval from dual 
+	 		</selectKey>
+	 	 -->
+	 	 <!-- 编写查询主键的sql语句，AFTER：当前sql在插入sql之后执行  -->
+	 	<selectKey keyProperty="id" order="AFTER" resultType="Integer">
+	 		select employees_seq.currval from dual 
+	 	</selectKey>
+	 	
+	 	<!-- 插入时的主键值是从序列中拿到的,BEFORE: 
+	 		insert into tbl_employees(employee_id,last_name, gender, email) values (#{id},#{lastName},#{gender},#{email})
+	 	-->
+	 	<!-- 插入时的主键值是从序列中拿到的,AFTER: 存在问题，常用的还是BEFORE-->
+	 	insert into tbl_employees(employee_id,last_name, gender, email) 
+	 	values (employees_seq.nextval,#{lastName},#{gender},#{email})
+	 </insert>
+	
+	<update id="updateEmp">
+		update 
+			tbl_employee 
+		set 
+			last_name = #{lastName}, 
+			gender = #{gender}, 
+			email = #{email}
+		where
+			id = #{id}
+	</update>
+	
+	<delete id="deleateEmpById">
+		delete from tbl_employee where id = #{id}
+	</delete>
+	
+	<!-- 测试多个参数查询 -->
+	<select id="getEmpByIdAndLastname" resultType="com.atguigu.mybatis.bean.Employee">
+		select * from ${tableName} where id = #{id} and last_name = #{lastName}
+	</select>
+	
+	<select id="getEmpsLastnameLike" resultType="com.atguigu.mybatis.bean.Employee">
+		select * from tbl_employee where last_name like #{lastName}
+	</select>
+	
+	<select id="getEmpByIdReturnMap" resultType="map">
+		select * from tbl_employee where id = #{id}
+	</select>
+	
+	<select id="getEmpReturnMaps" resultType="com.atguigu.mybatis.bean.Employee">
+		select * from tbl_employee
+	</select>
+</mapper>

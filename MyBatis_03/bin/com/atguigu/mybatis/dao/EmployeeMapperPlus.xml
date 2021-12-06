@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.mybatis.dao.EmployeeMapperPlus">
+	
+	<!-- 自定义某个JavaBean的封装规则 -->
+	<resultMap type="com.atguigu.mybatis.bean.Employee" id="myEmp">
+		<!-- 指定主键列的封装规则:底层会有优化 -->
+		<id column="id" property="id"/>
+		<!-- 其它列名与属性名一致的字段可不定义 -->
+		<result column="last_name" property="lastName"/>
+		<result column="gender" property="gender"/>
+		<result column="email" property="email"/>
+	</resultMap>
+	
+	<!-- resultMap:自定义结果集映射规则 -->
+	<select id="getEmpById" resultMap="myEmp">
+		select * from tbl_employee where id = #{id}
+	</select>
+	
+	<resultMap type="com.atguigu.mybatis.bean.Employee" id="myDifEmp">
+		<id column="id" property="id"/>
+		<result column="last_name" property="lastName"/>
+		<result column="gender" property="gender"/>
+		<result column="email" property="email"/>
+		<result column="did" property="department.id"/>
+		<result column="deptName" property="department.departmentName"/>
+	</resultMap>	
+	<select id="getEmpAndDept" resultMap="myDifEmp">
+		SELECT
+			e.id 		AS id,
+			e.last_name AS lastName,
+			e.gender 	AS gender,
+			e.email 	AS email,
+			e.d_id 		AS d_id,
+			d.id 		AS did,
+			d.dept_name AS deptName 
+		FROM
+			tbl_employee e
+			LEFT JOIN tbl_dept d ON e.d_id = d.id 
+		WHERE
+			e.id = #{id}
+	</select>
+</mapper>
