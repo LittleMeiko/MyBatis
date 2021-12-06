@@ -1,9 +1,12 @@
 package com.atguigu.mybatis.bean;
 
+import java.util.List;
+
 public class Department {
 
 	private Integer id;
-	private String departmentName;
+	private String deptName;
+	private List<Employee> emps;
 
 	public Integer getId() {
 		return id;
@@ -13,12 +16,25 @@ public class Department {
 		this.id = id;
 	}
 
-	public String getDepartmentName() {
-		return departmentName;
+	public String getDeptName() {
+		return deptName;
 	}
 
-	public void setDepartmentName(String departmentName) {
-		this.departmentName = departmentName;
+	public void setDeptName(String deptName) {
+		this.deptName = deptName;
+	}
+
+	public List<Employee> getEmps() {
+		return emps;
+	}
+
+	public void setEmps(List<Employee> emps) {
+		this.emps = emps;
+	}
+
+	@Override
+	public String toString() {
+		return "Department [id=" + id + ", deptName=" + deptName + "]";
 	}
 
 }

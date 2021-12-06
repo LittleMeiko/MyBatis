@@ -6,13 +6,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.plaf.synth.SynthGraphicsUtils;
+
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.junit.Test;
 
+import com.atguigu.mybatis.bean.Department;
 import com.atguigu.mybatis.bean.Employee;
+import com.atguigu.mybatis.dao.DepartmentMapper;
 import com.atguigu.mybatis.dao.EmployeeMapper;
 import com.atguigu.mybatis.dao.EmployeeMapperAnnotation;
 import com.atguigu.mybatis.dao.EmployeeMapperPlus;
@@ -189,9 +193,32 @@ public class MyBatisTest {
 		try {
 			EmployeeMapperPlus mapper = openSession.getMapper(EmployeeMapperPlus.class);
 			Employee emp = mapper.getEmpById(1);
+//			Employee emp = mapper.getEmpAndDept(1);
+//			Employee emp = mapper.getEmpByIdStep(1);
+			System.out.println(emp);
+			System.out.println(emp.getDept());
+		} finally {
+			openSession.close();
+		}
+	}
+	
+	@Test
+	public void test06() throws IOException {
+		SqlSessionFactory sqlSessionFactory = getSqlSessionFactory();
+		// 获取不会自动提交执行结果的SqlSession
+		SqlSession openSession = sqlSessionFactory.openSession();
+		
+		try {
+			DepartmentMapper mapper = openSession.getMapper(DepartmentMapper.class);
+//			Department dept = mapper.getDeptByIdPlus(1);
+//			Department dept = mapper.getDeptByIdStep(1);
+//			System.out.println(dept.getDeptName());
+//			System.out.println(dept.getEmps());
+			Department emp = mapper.getDeptById(1);
 			System.out.println(emp);
 		} finally {
 			openSession.close();
 		}
 	}
+	
 }

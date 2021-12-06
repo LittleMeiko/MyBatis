@@ -17,8 +17,14 @@
 		<!-- 
 			<setting name="mapUnderscoreToCamelCase" value="true"/>
 		 -->
+		 <!-- 开启自动映射功能，默认为PARTIAL开启 -->
+		<setting name="autoMappingBehavior" value="PARTIAL"/>
 		<!-- 设置在插入数据为null时映射到数据库中的值 -->
-		<setting name="jdbcTypeForNull" value="NULL"/>	
+		<setting name="jdbcTypeForNull" value="NULL"/>
+		<!-- 懒加载开启：关联的值在使用的时候被延迟加载 -->
+		<setting name="lazyLoadingEnabled" value="true"/>
+		<!-- 轻度懒加载：开启时每个属性都会被加载，关闭时按需加载 -->
+		<setting name="aggressiveLazyLoading" value="false"/>
 	</settings>
 	
 	<!-- 3.typeAliases:别名处理器，可以为Java类型的引用取别名，且别名不区分大小写 -->
